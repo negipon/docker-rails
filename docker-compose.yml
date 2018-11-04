@@ -1,13 +1,23 @@
 version: '3'
 services:
   db:
-    image: postgres:10.1-alpine
-  web:
-    build: .
-    command: bin/rails s -p 3000 -b '0.0.0.0'
+    image: mysql:5.7
     volumes:
-      - .:/usr/src/app
+      - .mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: xxxxxx
+  web: &web_base
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/myapp
     ports:
       - "3000:3000"
     depends_on:
       - db
+  spring:
+    <<: *web_base
+    command: bundle exec spring server
+    ports: []
+    tty: false
+    stdin_open: false
