@@ -1,27 +1,13 @@
-version: '2'
+version: '3'
 services:
   db:
-    image: mysql:5.7.17
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./docker/mysql/volumes:/var/lib/mysql
-    extends:
-      file: ./docker/mysql/password.yml
-      service: password
+    image: postgres:10.1-alpine
   web:
-    build:
-      context: .
-      dockerfile: ./docker/rails/Dockerfile
-    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    build: .
+    command: bin/rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/usr/src/app
     ports:
       - "3000:3000"
-    volumes:
-      - .:/myapp
-    environment:
-      RAILS_ENV: development
-    extends:
-      file: ./docker/mysql/password.yml
-      service: password
     depends_on:
       - db

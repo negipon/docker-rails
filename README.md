@@ -1,24 +1,61 @@
-# README
+# rails5-docker-alpine
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a very lightweight Docker image based on Ruby Alpine to run a Rails 5
+application.
+I also provide a docker-compose file to run your project using a PostgreSQL
+database.
 
-Things you may want to cover:
+## Trying out the image
 
-* Ruby version
+Clone the repository:
 
-* System dependencies
+```sh
+git clone git@github.com:pacuna/rails5-docker-alpine.git
+```
 
-* Configuration
+Create a new Rails application under the repository directory
 
-* Database creation
+```sh
+cd rails-docker-alpine
+rails new . --database=postgresql
+```
 
-* Database initialization
+Modify your database configuration to use the postgresql container configuration:
 
-* How to run the test suite
+```yaml
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: db
+  username: postgres
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+Build the project:
 
-* Deployment instructions
+```sh
+docker-compose build
+```
 
-* ...
+Create the database and run the migrations:
+
+```
+docker-compose run --rm web bin/rails db:create
+docker-compose run --rm web bin/rails db:migrate
+```
+
+Run the app:
+
+```sh
+docker-compose up -d
+```
+
+Visit your application at localhost:3000.
+
+Tested with:
+- Ruby 2.5.1p57 (2018-03-29 revision 63029) [x86_64-linux]
+- Rails 5.2.1 (to create the new application)
+- Docker version 18.06.1-ce, build e68fc7a
+- Docker-compose version 1.22.0, build f46880fe
